@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Générateur Signature Flexocolor</title>
+<style>
+* { box-sizing: border-box; }
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+  margin: 0;
+  padding: 20px;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 20px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+h2 {
+  margin-top: 0;
+}
+
+input, select {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #d74404;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px dashed #ccc;
+}
+
+.checkbox-group input {
+  width: auto;
+  margin-bottom: 0;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background: #d74404;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+button:hover { background: #b73700; }
+
+button.btn-dark {
+  background: #333;
+}
+button.btn-dark:hover { background: #111; }
+
+button.btn-success {
+  background: #2a7a2a;
+}
+button.btn-success:hover { background: #1e5c1e; }
+
+button.btn-danger {
+  background: #999;
+}
+button.btn-danger:hover { background: #777; }
+
+button.btn-small {
+  padding: 6px 10px;
+  font-size: 12px;
+  margin-bottom: 0;
+  width: auto;
+}
+
+#preview {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  min-height: 200px;
+  border: 1px solid #eee;
+}
+
+textarea {
+  width: 100%;
+  height: 150px;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 8px;
+  font-size: 12px;
+}
+
+#dir_inputs {
+  margin-top: 5px;
+  padding-left: 10px;
+  border-left: 2px solid #d74404;
+}
+
+/* ===== BDD SECTION ===== */
+.db-section {
+  background: #fff8f6;
+  border: 1px solid #f0cfc4;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 18px;
+}
+
+.db-section h3 {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  color: #d74404;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.db-select-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.db-select-row select {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.db-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.db-actions button {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.separator {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: 15px 0;
+}
+
+.badge {
+  background: #d74404;
+  color: white;
+  border-radius: 10px;
+  padding: 1px 7px;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: #2a7a2a;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 9999;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; }
+.toast.error { background: #c0392b; }
+
+button.btn-outline { background: white; color: #d74404; border: 1px solid #d74404; }
+button.btn-outline:hover { background: #fff1ec; }
+.hint { font-size: 12px; color: #777; margin: 0 0 8px 0; }
+textarea.intro { height: 70px; margin-top: 0; font-family: Arial, sans-serif; font-size: 14px; resize: vertical; }
+label.lbl { font-size: 13px; font-weight: bold; display: block; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="card">
+    <h2>Informations</h2>
+
+    <div class="db-section">
+      <h3>📋 Annuaire employés <span class="badge" id="db-count">0</span></h3>
+      <div class="db-select-row">
+        <select id="db-select" onchange="loadEmployee()">
+          <option value="">— Sélectionner un employé —</option>
+        </select>
+      </div>
+      <div class="db-actions">
+        <button class="btn-small btn-outline" onclick="loadData(true)">🔄 Recharger l'annuaire</button>
+      </div>
+    </div>
+
+    <input id="prenom" type="text" placeholder="Prénom">
+    <input id="nom" type="text" placeholder="Nom">
+    <input id="poste" type="text" placeholder="Poste">
+    <input id="email" type="text" placeholder="Email">
+    <input id="telephone" type="text" placeholder="Téléphone">
+
+    <div class="checkbox-group">
+      <input type="checkbox" id="enable_dir" onchange="toggleDirFields()">
+      <label for="enable_dir">Ajouter les infos Directeur</label>
+    </div>
+
+    <div id="dir_inputs" style="display:none;">
+      <input id="dir_poste" type="text" placeholder="Fonction du directeur" value="Directeur Commercial Associé">
+      <input id="dir_nom" type="text" placeholder="Nom du directeur">
+      <input id="dir_email" type="text" placeholder="Email du directeur">
+    </div>
+
+    <label class="lbl" for="intro_text">Message au-dessus de la signature (facultatif)</label>
+    <textarea id="intro_text" class="intro" oninput="generate()" placeholder="Ex. : Merci.&#10;Bonne journée"></textarea>
+
+    <hr class="separator">
+
+    <label class="lbl" for="logoSelect">Choix du Logo</label>
+    <select id="logoSelect" onchange="generate()"></select>
+
+    <label class="lbl" for="footerSelect">Choix du Bandeau Mail</label>
+    <select id="footerSelect" onchange="generate()">
+      <option value="">Aucun Bandeau Mail</option>
+    </select>
+
+    <button onclick="generate()">Générer la signature</button>
+    <button onclick="downloadHTML()" class="btn-dark">Télécharger le fichier HTML</button>
+  </div>
+
+  <div class="card">
+    <h2>Aperçu</h2>
+    <div id="preview"></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// =====================================================
+//  CONFIGURATION  (seule partie à adapter à l'hébergement)
+// =====================================================
+const CONFIG = {
+  employeesUrl: 'data/employees.json',
+  footersUrl:   'data/footers.json',
+  logosUrl:     'data/logos.json',
+  // Dossier des images fixes (logo, réseaux...). Laisser vide = dossier "images/"
+  // situé à côté de cette page. Outlook a besoin d'URL ABSOLUES : en hébergement,
+  // elles sont déduites automatiquement de l'adresse de la page.
+  imagesBase: ''
+};
+
+const ABS = (u) => new URL(u, location.href).href;
+const IMG = (name) => ABS((CONFIG.imagesBase || 'images/').replace(/\/?$/, '/') + name);
+
+// =====================================================
+//  DONNÉES (chargées depuis les fichiers JSON)
+// =====================================================
+let employees = [];
+let footers = [];
+let logos = [];
+
+// Logo de secours : utilisé seulement si data/logos.json est introuvable
+const DEFAULT_LOGOS = [{
+  id: 'logo_flexocolor', label: 'Logo Flexocolor (par défaut)',
+  image_url: 'images/logo.png', width: 290, lien: 'http://www.flexocolor-fr.com'
+}];
+
+async function fetchJSON(url) {
+  const r = await fetch(url, { cache: 'no-store' });
+  if (!r.ok) throw new Error(url + ' (' + r.status + ')');
+  return r.json();
+}
+
+async function loadData(manual = false) {
+  try {
+    const [e, f, l] = await Promise.all([
+      fetchJSON(CONFIG.employeesUrl),
+      fetchJSON(CONFIG.footersUrl),
+      fetchJSON(CONFIG.logosUrl).catch(() => DEFAULT_LOGOS)
+    ]);
+    employees = e.filter(x => x.actif !== false)
+                 .sort((a, b) => (a.prenom + ' ' + a.nom).localeCompare(b.prenom + ' ' + b.nom, 'fr'));
+    footers = f.filter(x => x.actif !== false);
+    logos = l.filter(x => x.actif !== false);
+    if (!logos.length) logos = DEFAULT_LOGOS;
+    renderEmployeeSelect();
+    renderLogoSelect();
+    renderFooterSelect();
+    generate();
+    if (manual) showToast('✅ Annuaire rechargé');
+  } catch (err) {
+    console.error(err);
+    showToast('⚠️ Données introuvables : la page doit être ouverte depuis un serveur (pas en double-clic)', true);
+  }
+}
+
+function renderEmployeeSelect() {
+  const sel = document.getElementById('db-select');
+  const current = sel.value;
+  sel.innerHTML = '<option value="">— Sélectionner un employé —</option>' +
+    employees.map(e => `<option value="${e.id}">${e.prenom} ${e.nom.toUpperCase()}</option>`).join('');
+  if (current && employees.some(e => e.id === current)) sel.value = current;
+  document.getElementById('db-count').textContent = employees.length;
+}
+
+function renderLogoSelect() {
+  const sel = document.getElementById('logoSelect');
+  const current = sel.value;
+  sel.innerHTML = logos.map(l => `<option value="${l.id}">${l.label}</option>`).join('');
+  // par défaut : le premier logo actif du fichier
+  sel.value = (current && logos.some(l => l.id === current)) ? current : logos[0].id;
+}
+
+function renderFooterSelect() {
+  const sel = document.getElementById('footerSelect');
+  const current = sel.value;
+  sel.innerHTML = '<option value="">Aucun Bandeau Mail</option>' +
+    footers.map(f => `<option value="${f.id}">${f.label}</option>`).join('');
+  // par défaut : le premier bandeau actif du fichier
+  sel.value = (current && footers.some(f => f.id === current)) ? current : (footers[0] ? footers[0].id : '');
+}
+
+function loadEmployee() {
+  const emp = employees.find(e => e.id === document.getElementById('db-select').value);
+  if (!emp) return;
+
+  setVal('prenom', emp.prenom);
+  setVal('nom', emp.nom);
+  setVal('poste', emp.poste);
+  setVal('email', emp.email);
+  setVal('telephone', emp.telephone);
+
+  const mgr = employees.find(e => e.id === emp.manager_id);
+  document.getElementById('enable_dir').checked = !!mgr;
+  toggleDirFields();
+  if (mgr) {
+    setVal('dir_poste', mgr.poste || 'Directeur');
+    setVal('dir_nom', `${mgr.prenom} ${mgr.nom.toUpperCase()}`);
+    setVal('dir_email', mgr.email);
+  }
+  generate();
+}
+
+function esc(t) {
+  return t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function setVal(id, v) { document.getElementById(id).value = v || ''; }
+function val(id) { return document.getElementById(id).value.trim(); }
+
+function toggleDirFields() {
+  document.getElementById('dir_inputs').style.display =
+    document.getElementById('enable_dir').checked ? 'block' : 'none';
+}
+
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError ? ' error' : '');
+  setTimeout(() => { t.className = 'toast'; }, 3500);
+}
+
+// =====================================================
+//  TEMPLATE SIGNATURE (images par URL, pas en base64)
+// =====================================================
+function buildSignature() {
+  const showDir = document.getElementById('enable_dir').checked;
+  const footer = footers.find(f => f.id === document.getElementById('footerSelect').value);
+
+  const email = val('email')
+    ? `<a href="mailto:${val('email')}">${val('email')}</a><br>` : '';
+  const tel = val('telephone') ? `${val('telephone')}<br>` : '';
+  const dir = showDir ? `
+      <span style="font-size:12px;"><em><span style="color:#d74404;font-weight:bold;">${val('dir_poste')} :</span>
+      <strong>${val('dir_nom')}</strong> / <a href="mailto:${val('dir_email')}">${val('dir_email')}</a></em></span><br>` : '';
+
+  const introTxt = document.getElementById('intro_text').value.trim();
+  const introRow = introTxt ? `
+  <tr>
+    <td style="padding-bottom:30px;vertical-align:top;font-size:14px;">
+      ${esc(introTxt).replace(/\r?\n/g, '<br>')}
+    </td>
+  </tr>` : '';
+
+  const logo = logos.find(l => l.id === document.getElementById('logoSelect').value) || logos[0] || DEFAULT_LOGOS[0];
+  const lw = logo.width || 290;
+  const logoImg = `<img src="${ABS(logo.image_url)}" alt="${logo.label}" width="${lw}" style="width:${lw}px;height:auto;border:0;display:block;">`;
+
+  let footerRow = '';
+  if (footer) {
+    const w = footer.width || 850;
+    const img = `<img src="${ABS(footer.image_url)}" alt="${footer.label}" width="${w}" style="width:${w}px;max-width:100%;height:auto;border:0;display:block;">`;
+    footerRow = `
+  <tr>
+    <td style="padding-top:15px;padding-left:70px;vertical-align:top;">
+      ${footer.lien ? `<a href="${footer.lien}">${img}</a>` : img}
+    </td>
+  </tr>`;
+  }
+
+  return `
+<table border="0" cellpadding="0" cellspacing="0" style="font-family:Arial,sans-serif;font-size:13px;line-height:18px;">${introRow}
+  <tr>
+    <td style="padding-right:15px;padding-left:10px;vertical-align:top;">
+      ${logo.lien ? `<a href="${logo.lien}">${logoImg}</a>` : logoImg}
+    </td>
+  </tr>
+  <tr>
+    <td style="padding-left:70px;padding-top:10px;vertical-align:top;">
+      <strong style="font-size:19px;">${val('prenom')} ${val('nom').toUpperCase()}</strong><br>
+      <span style="color:#d74404;"><strong>${val('poste')}</strong></span><br>
+      ${email}${tel}${dir}
+      10 rue Gustave Eiffel – Z.A. du Châtenet - 87410 Le Palais-sur-Vienne<br>
+      Adresse postale : CS 72055 87070 Limoges cedex - Tel. +33(0)5 55 35 58 38<br>
+      <a href="http://www.flexocolor-fr.com"><strong>www.flexocolor-fr.com</strong></a>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding-top:15px;padding-left:70px;vertical-align:top;">
+      <img src="${IMG('autres_sites.png')}" alt="Autres sites" width="500" style="width:500px;height:auto;border:0;vertical-align:top;">
+      <a href="https://www.linkedin.com/company/flexocolor/posts/?feedView=all" style="text-decoration:none;">
+        <img src="${IMG('linkedin.png')}" alt="LinkedIn" width="18" style="width:18px;height:auto;border:0;vertical-align:top;margin-left:7px;">
+      </a>
+      <a href="https://www.youtube.com/@FLEXOCOLOR" style="text-decoration:none;">
+        <img src="${IMG('youtube.png')}" alt="YouTube" width="27" style="width:27px;height:auto;border:0;vertical-align:top;margin-left:7px;">
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding-left:70px;padding-top:7px;vertical-align:top;">
+      <span style="color:#129d39;"><strong>Adoptez l'eco-attitude. N'imprimez ce mail que si nécessaire.</strong></span>
+    </td>
+  </tr>${footerRow}
+</table>`;
+}
+
+function generate() {
+  document.getElementById('preview').innerHTML = buildSignature();
+}
+
+// =====================================================
+//  EXPORT
+// =====================================================
+
+
+function downloadHTML() {
+  generate();
+  const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>' +
+               document.getElementById('preview').innerHTML + '</body></html>';
+  const blob = new Blob([html], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${val('prenom') || 'signature'}_${val('nom')}_signature.html`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+  showToast('⬇️ Signature HTML téléchargée !');
+}
+
+loadData();
+</script>
+</body>
+</html>

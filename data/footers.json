@@ -1,0 +1,18 @@
+[
+  {
+    "id": "footer_2026",
+    "label": "Bandeau Flexocolor 2026",
+    "image_url": "images/bandeau_2026.png",
+    "width": 850,
+    "lien": "",
+    "actif": true
+  },
+    {
+    "id": "footer_EXE",
+    "label": "Bandeau Flexocolor EXE",
+    "image_url": "images/BandeauMailFacil_2025.gif",
+    "width": 850,
+    "lien": "",
+    "actif": true
+  }
+]

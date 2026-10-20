@@ -1,0 +1,18 @@
+[
+  {
+    "id": "logo_flexocolor",
+    "label": "Logo Flexocolor (par défaut)",
+    "image_url": "images/LogoFlexocolor.png",
+    "width": 290,
+    "lien": "http://www.flexocolor-fr.com",
+    "actif": true
+  },
+    {
+    "id": "logo_flexocolorOctobreRose",
+    "label": "Logo Flexocolor Octobre Rose",
+    "image_url": "images/LogoFlexocolorOctobreRose.png",
+    "width": 290,
+    "lien": "http://www.flexocolor-fr.com",
+    "actif": true
+  }
+]
