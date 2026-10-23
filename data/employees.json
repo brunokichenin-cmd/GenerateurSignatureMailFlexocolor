@@ -10,22 +10,22 @@
     "actif": true
   },
   {
-    "id": "lsage",
-    "prenom": "Laura",
-    "nom": "SAGE",
-    "poste": "Assistante de Direction",
-    "email": "laura.sage@flexocolor-fr.com",
-    "telephone": "+33 (0)5 55 35 74 63",
-    "manager_id": "pdefaye",
+    "id": "jdupont",
+    "prenom": "Jean",
+    "nom": "Dupont",
+    "poste": "Technico-commercial",
+    "email": "j.dupont@flexocolor-fr.com",
+    "telephone": "+33 5 55 35 58 38",
+    "manager_id": "mmartin",
     "actif": true
   },
   {
-    "id": "pdefaye",
-    "prenom": "Philippe",
-    "nom": "DEFAYE",
-    "poste": "Directeur Commercial",
-    "email": "philippe.defaye@flexocolor-fr.com",
-    "telephone": "+33 (0)6 11 45 33 10",
+    "id": "sleroy",
+    "prenom": "Sophie",
+    "nom": "Leroy",
+    "poste": "Assistante ADV",
+    "email": "s.leroy@flexocolor-fr.com",
+    "telephone": "+33 5 55 35 58 38",
     "manager_id": "",
     "actif": true
   }
